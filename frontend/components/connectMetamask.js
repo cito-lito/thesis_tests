@@ -1,7 +1,8 @@
 import { useWeb3React } from '@web3-react/core'
-import { InjectedConnector } from '@web3-react/injected-connector'
 import { injected } from '../connectors';
 
+//stiling
+import { Button } from '@mui/material';
 export default function ConnectMetamask() {
     const { active, account, chainId, activate, deactivate } = useWeb3React();
     console.log(account)
@@ -13,12 +14,15 @@ export default function ConnectMetamask() {
     // console.log("wrong network")
     return (
         <div>
+
             {active ? (
                 <div>Connected:{account}
-                    <button onClick={deactivate}>Disconnect</button>
+                    <Button onClick={deactivate}>Disconnect</Button>
                 </div>) :
-                (<button onClick={() => { activate(injected) }}>Connect Metamask</button>)
+                (<Button onClick={() => { activate(injected) }}>Connect Metamask</Button>)
             }
+
+
         </div>
     )
 
