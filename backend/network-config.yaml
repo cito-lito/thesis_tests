@@ -15,4 +15,4 @@ live:
     host: https://eth-rinkeby.alchemyapi.io/v2/$WEB3_ALCHEMY_PROJECT_ID
     id: rinkeby-alchemy
     multicall2: '0x5ba1e12693dc8f9c48aad8770482f4739beed696'
-    name: Mainnet (alchemy)
+    name: Rinkeby (alchemy)
