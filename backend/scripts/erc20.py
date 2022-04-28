@@ -27,7 +27,7 @@ def main():
     token_addr = config['networks'][network.show_active()]['dai']
     account = utils.get_account('dev')
     aWeth_balance = erc20.balance_of(account.address, '0x608D11E704baFb68CfEB154bF7Fd641120e33aD4')
-    print(aWeth_balance)
+    print(f"aWeth balance: {aWeth_balance}")
     aDai = '0x49866611AA7Dc30130Ac6A0DF29217D16FD87bc0'
     aDai_balance= erc20.balance_of(account.address,aDai )
     print(f"aDai: {aDai_balance}")
