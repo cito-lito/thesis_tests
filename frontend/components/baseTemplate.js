@@ -8,10 +8,8 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import StarIcon from '@mui/icons-material/StarBorder';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Container from '@mui/material/Container';
 import ConnectMetamask from './connectMetamask';
@@ -19,13 +17,9 @@ import { useWeb3React } from '@web3-react/core';
 
 
 
-function Copyright(props) {
+function DisplayYear(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-       UI from material ui template
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -34,7 +28,7 @@ function Copyright(props) {
 
 const tiers = [
   {
-    title: 'Free',
+    title: 'DAI',
     price: '0',
     description: [
       '10 users included',
@@ -43,7 +37,7 @@ const tiers = [
       'Email support',
     ],
     buttonText1: 'disconnect_1',
-    buttonVariant: 'outlined',
+    buttonVariant1: 'outlined',
   },
   {
     title: 'Pro',
@@ -55,17 +49,18 @@ const tiers = [
       'Priority email support',
     ],
     buttonText2: 'disc_2',
-    buttonVariant: 'outlined',
+    buttonVariant2: 'outlined',
   },
-  
-  
+    
 ];
 
-const footers = [
-
-];
-
-function PricingContent() {
+function a(){
+  console.log("aaaaAAAaaa")
+}
+function b(){
+  console.log("bbbbbb")
+}
+function Assets() {
   const {deactivate, activate} = useWeb3React();
 
   return (
@@ -80,11 +75,8 @@ function PricingContent() {
       >
         <Toolbar sx={{ flexWrap: 'wrap' }}>
           <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            Thesis Dapp
+            THESIS DAPP
           </Typography>
-          <nav>
-            
-          </nav>
           <Button href="#" variant="outlined" sx={{ my: 1, mx: 1.5 }}>
             <ConnectMetamask/>
           </Button>
@@ -142,10 +134,7 @@ function PricingContent() {
                     }}
                   >
                     <Typography component="h2" variant="h3" color="text.primary">
-                      ${tier.price}
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary">
-                      /mo
+                      {tier.price}
                     </Typography>
                   </Box>
                   <ul>
@@ -162,10 +151,10 @@ function PricingContent() {
                   </ul>
                 </CardContent>
                 <CardActions>
-                  <Button onClick={deactivate}fullWidth variant={tier.buttonVariant}>
+                  <Button onClick={() =>a()}fullWidth variant={"outlined"}>
                     deposit
                   </Button>
-                  <Button onClick={deactivate}fullWidth variant={tier.buttonVariant}>
+                  <Button onClick={() =>b()}fullWidth variant={"text"}>
                     withdrawahl
                   </Button>
                 </CardActions>
@@ -174,6 +163,7 @@ function PricingContent() {
           ))}
         </Grid>
       </Container>
+
       {/* Footer */}
       <Container
         maxWidth="md"
@@ -184,31 +174,15 @@ function PricingContent() {
           py: [3, 6],
         }}
       >
-        <Grid container spacing={4} justifyContent="space-evenly">
-          {footers.map((footer) => (
-            <Grid item xs={6} sm={3} key={footer.title}>
-              <Typography variant="h6" color="text.primary" gutterBottom>
-                {footer.title}
-              </Typography>
-              <ul>
-                {footer.description.map((item) => (
-                  <li key={item}>
-                    <Link href="#" variant="subtitle1" color="text.secondary">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Grid>
-          ))}
-        </Grid>
-        <Copyright sx={{ mt: 5 }} />
+
+        <DisplayYear sx={{ mt: 5 }} />
       </Container>
       {/* End footer */}
+
     </React.Fragment>
   );
 }
 
 export default function BaseTemplate() {
-  return <PricingContent />;
+  return <Assets />;
 }

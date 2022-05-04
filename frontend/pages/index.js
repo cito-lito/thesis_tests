@@ -1,15 +1,11 @@
 import Head from 'next/head'
-
 import { useWeb3React } from '@web3-react/core'
-import ConnectMetamask from '../components/connectMetamask'
 
 import { ethers } from 'ethers';
 import * as data from "../brownie-config.json"
 import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import {useState } from 'react';
-
 import BaseTemplate from '../components/baseTemplate';
-
 
 
 async function getBalanceErc20(provider, account, erc_addr) {
@@ -22,7 +18,7 @@ async function getBalanceErc20(provider, account, erc_addr) {
   }
 }
 
-export default function Home() {
+function getBalance(){
   const [balance, setBalance] = useState(0);
   const { active, account, library: provider } = useWeb3React();
   if (active) {
@@ -40,6 +36,10 @@ export default function Home() {
     })
   }
 
+}
+
+export default function Home() {
+  getBalance();
   return (
     <div>
       <BaseTemplate/>
