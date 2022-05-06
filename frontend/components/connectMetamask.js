@@ -1,12 +1,10 @@
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../connectors';
-
 //
-import { Button, Box } from '@mui/material';
+import { Button } from '@mui/material';
 
 export default function ConnectMetamask() {
     const { active, account, chainId, activate, deactivate } = useWeb3React();
-
     return (
         <div >
 
@@ -16,9 +14,7 @@ export default function ConnectMetamask() {
                 </div>) :
                 (<Button onClick={() => { activate(injected) }}>Connect Metamask</Button>)
             }
-
         </div>
     )
-
 }
 
