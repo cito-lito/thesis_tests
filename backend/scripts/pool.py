@@ -66,12 +66,7 @@ def get_pool():
     pool_addr = pool_addr_prov.getPool()
     return interface.IPool(pool_addr)
 
-
-def main():
-    # account = utils.get_account("dev")
-
-    token_addr = config["networks"][network.show_active()]["dai"]
-
+def get_apy(asset_addr):
     (
         configuration,
         liquidityIndex,
@@ -88,12 +83,19 @@ def main():
         accruedToTreasury,
         unbacked,
         isolationModeTotalDebt,
-    ) = get_reserved_data("0xd74047010D77c5901df5b0f9ca518aED56C85e8D")
+    ) = get_reserved_data(asset_addr)
     print(currentLiquidityRate)   
     SECONDS_PER_YEAR = 31536000
     RAY = 10**27
     depositAPR = currentLiquidityRate/RAY
     depositAPY = ((1 + (depositAPR / SECONDS_PER_YEAR)) ** SECONDS_PER_YEAR) - 1
-    print(depositAPY)
+    return depositAPY
+    
+
+def main():
+    # account = utils.get_account("dev")
+
+    token_addr = config["networks"][network.show_active()]["dai"]
+
 if __name__ == "__main__":
     main()
