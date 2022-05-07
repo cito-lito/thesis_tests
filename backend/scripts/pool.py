@@ -14,11 +14,7 @@ def supply(asset_addr, amount, on_behalf_of, referral_code=0):
 
     pool = get_pool()
     tx = pool.supply(
-        asset_addr,
-        amount,
-        on_behalf_of.address,
-        referral_code,
-        {"from": on_behalf_of}
+        asset_addr, amount, on_behalf_of.address, referral_code, {"from": on_behalf_of}
     )
     tx.wait(1)
 
@@ -54,6 +50,15 @@ def get_user_acc_data(addr):
     return pool.getUserAccountData(addr)
 
 
+def get_reserved_data(asset_addr):
+    """Returns the state and configuration of the reserve
+    Args:
+        asset_addr: asset The address of the underlying asset of the reserve
+    """
+    pool = get_pool()
+    return pool.getReserveData(asset_addr)
+
+
 def get_pool():
     pool_addr_prov = interface.IPoolAddressesProvider(
         config["networks"][network.show_active()]["pool_addr_provider"]
@@ -63,19 +68,32 @@ def get_pool():
 
 
 def main():
-    account = utils.get_account("dev")
-    lp = get_pool()
-    token_addr = config["networks"][network.show_active()]["weth"]
-    amount = Wei("0.1 ether")
-    x = weth.balance_of(account.address)
-    
-    print(f"weth_balance: {x} lpAddres: {lp.address} amount: {amount}")
-    erc20.approve_erc20(account, amount, token_addr, lp.address)
-    a = erc20.check_allowance(account.address, token_addr, lp.address)
-    print(a)
-    supply(token_addr, amount, account)
-    pass
+    # account = utils.get_account("dev")
 
+    token_addr = config["networks"][network.show_active()]["dai"]
 
+    (
+        configuration,
+        liquidityIndex,
+        currentLiquidityRate,
+        variableBorrowIndex,
+        currentVariableBorrowRate,
+        currentStableBorrowRate,
+        lastUpdateTimestamp,
+        id,
+        aTokenAddress,
+        stableDebtTokenAddress,
+        variableDebtTokenAddress,
+        interestRateStrategyAddress,
+        accruedToTreasury,
+        unbacked,
+        isolationModeTotalDebt,
+    ) = get_reserved_data("0xd74047010D77c5901df5b0f9ca518aED56C85e8D")
+    print(currentLiquidityRate)   
+    SECONDS_PER_YEAR = 31536000
+    RAY = 10**27
+    depositAPR = currentLiquidityRate/RAY
+    depositAPY = ((1 + (depositAPR / SECONDS_PER_YEAR)) ** SECONDS_PER_YEAR) - 1
+    print(depositAPY)
 if __name__ == "__main__":
     main()
