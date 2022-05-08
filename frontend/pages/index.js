@@ -92,14 +92,17 @@ export default function Home() {
           {/* */}
           <Grid item xs={4} sm={6} md={6}>
             <Card>
-              <CardHeader title={"DAI"} subheader={userBalances(data.networks.rinkeby.dai)} titleTypographyProps={{ align: 'center' }}
+              <CardHeader title={"DAI"} titleTypographyProps={{ align: 'center' }}
                 subheaderTypographyProps={{ align: 'center' }} sx={sx_header} />
 
               <CardContent>
                 <Box sx={sx_card}>
                   <Typography component="h1" variant="h6">
                     <ul>
-                      APY: {apyDai} % 
+                      APY: {apyDai} %
+                    </ul>
+                    <ul>
+                      Balance: {userBalances(data.networks.rinkeby.dai)}
                     </ul>
                     <ul>
                       Deposited: {userBalances(data.networks.rinkeby.aDAI)}
