@@ -1,6 +1,7 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
+import { Avatar } from '@mui/material';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -20,6 +21,7 @@ import { ethers } from 'ethers';
 import * as data from "../brownie-config.json"
 import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import { useState } from 'react';
+import { get_apy } from '../getAPY';
 
 
 
@@ -56,8 +58,19 @@ function userBalances(erc_addr = "undefined") {
   }
 }
 
-export default function Home() {
 
+export default function Home() {
+  const [apyDai, setApyDai] = useState(0);
+  const [apyWeth, setApyWeth] = useState(0)
+  const { active } = useWeb3React();
+  if (active) {
+    get_apy(data.networks.rinkeby.dai).then((value) => {
+      setApyDai(value)
+    })
+    get_apy(data.networks.rinkeby.weth).then((value) => {
+      setApyWeth(value)
+    })
+  }
   return (
     <React.Fragment>
       <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
@@ -79,13 +92,14 @@ export default function Home() {
           {/* */}
           <Grid item xs={4} sm={6} md={6}>
             <Card>
-              <CardHeader title={"DAI"} subheader="2%" titleTypographyProps={{ align: 'center' }}
+              <CardHeader title={"DAI"} subheader={userBalances(data.networks.rinkeby.dai)} titleTypographyProps={{ align: 'center' }}
                 subheaderTypographyProps={{ align: 'center' }} sx={sx_header} />
+
               <CardContent>
                 <Box sx={sx_card}>
                   <Typography component="h1" variant="h6">
                     <ul>
-                      Balance: {userBalances(data.networks.rinkeby.dai)}
+                      APY: {apyDai} % 
                     </ul>
                     <ul>
                       Deposited: {userBalances(data.networks.rinkeby.aDAI)}
