@@ -1,6 +1,7 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 import { Avatar } from '@mui/material';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -21,7 +22,8 @@ import { ethers } from 'ethers';
 import * as data from "../brownie-config.json"
 import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import { useState } from 'react';
-import { get_apy } from '../getAPY';
+import { getApy } from '../lendingPoolAaveV3';
+import { parseUnits } from 'ethers/lib/utils';
 
 
 
@@ -58,19 +60,51 @@ function userBalances(erc_addr = "undefined") {
   }
 }
 
-
 export default function Home() {
   const [apyDai, setApyDai] = useState(0);
-  const [apyWeth, setApyWeth] = useState(0)
+  const [apyWeth, setApyWeth] = useState(0);
   const { active } = useWeb3React();
+  // inputs
+  const [inputValue, setInputValue] = useState("");
+  const [inputWithdraw, setInputWithdraw] = useState("");
+
+  const handleInputDeposit = (event) => {
+    const input = event.target.value;
+    console.log("entering", input)
+    if (!isNaN(input)) {
+      setInputValue(input);
+    } else {
+      alert("enter a valid imput")
+      setInputValue("")
+    }
+    event.preventDefault();
+  }
+  const handleInputWithdraw = (event) => {
+    const input = event.target.value;
+    console.log("entering", input)
+    if (!isNaN(input)) {
+      setInputWithdraw(input);
+    } else {
+      alert("enter a valid imput")
+      setInputWithdraw("")
+    }
+    event.preventDefault();
+  }
+  const test = (val) => {
+    console.log(val)
+    setInputValue("")
+    setInputWithdraw("")
+  }
   if (active) {
-    get_apy(data.networks.rinkeby.dai).then((value) => {
+    getApy(data.networks.rinkeby.dai).then((value) => {
       setApyDai(value)
     })
-    get_apy(data.networks.rinkeby.weth).then((value) => {
+    getApy(data.networks.rinkeby.weth).then((value) => {
       setApyWeth(value)
     })
   }
+  const a = ethers.utils.parseEther('0.000000000000000009')
+  console.log(a.toBigInt())
   return (
     <React.Fragment>
       <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
@@ -111,12 +145,24 @@ export default function Home() {
                 </Box>
               </CardContent>
               <CardActions>
-                <Button onClick={() => a()} fullWidth variant={"outlined"}>
-                  Deposit{'  '}{ }
-                </Button>
-                <Button onClick={() => b()} fullWidth variant={"outlined"}>
-                  withdraw{'  '}{ }
-                </Button>
+                <ul>
+                  <TextField  variant="outlined" label="enter amount" size="small"
+                    value={inputValue}
+                    onChange={handleInputDeposit}
+                  />
+                  <Button onClick={() => test(inputValue)} fullWidth variant={"outlined"}>
+                    Deposit{' '}
+                  </Button>
+                </ul>
+                <ul>
+                  <TextField  variant="outlined" label="enter amount" size="small"
+                    value={inputWithdraw}
+                    onChange={handleInputWithdraw}
+                  />
+                  <Button onClick={() => test(inputValue)} fullWidth variant={"outlined"}>
+                    withdraw{'  '}
+                  </Button>
+                </ul>
               </CardActions>
             </Card>
           </Grid>

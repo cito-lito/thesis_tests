@@ -8,20 +8,28 @@ import IPool from "./brownie_build/interfaces/IPool.json"
 const SECONDS_PER_YEAR = 31536000
 const RAY = 10 ** 27
 
-export async function get_apy(asset_addr) {
-    console.log("init get pool")
+/**
+ * Get read only contract
+ * @returns read only contract
+ */
+async function getPoolContract() {
     const { library: provider } = useWeb3React();
-    console.log("provider: ", provider)
     const addr = data.networks.rinkeby.pool_addr_provider
     const abi = IPoolAddressProvider.abi
     try {
         const pool_addr_prov = new ethers.Contract(addr, abi, provider);
-        console.log("popool_addr_provol: ", pool_addr_prov)
         const pool_addr = await pool_addr_prov.getPool()
-        console.log("pool_addr", pool_addr)
-
         const pool = new ethers.Contract(pool_addr, IPool.abi, provider);
-        console.log("returning pool: ", pool)
+        return pool;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function getApy(asset_addr) {
+
+    try {
+        const pool = await getPoolContract()
         const [
             configuration,
             liquidityIndex,
@@ -40,7 +48,7 @@ export async function get_apy(asset_addr) {
             isolationModeTotalDebt,
 
         ] = await pool.getReserveData(asset_addr)
-       
+
         const supplyRate = currentLiquidityRate.toBigInt()
         const supplyRateNumber = Number(supplyRate)
         const depositAPR = supplyRateNumber / RAY
@@ -52,4 +60,23 @@ export async function get_apy(asset_addr) {
     }
 }
 
-
+/**
+ * Supplies an amount of underlying asset into the reserve, receiving in return overlying aTokens.
+    E.g. User supplies 100 DAI and gets in return 100 aDAI
+ * @param assetAddr 
+ * @param amount 
+ * @param referralCode: optional default to 0 
+ */
+export async function aaveDeposit(assetAddr, amount, referralCode = 0) {
+    const { account, library: provider } = useWeb3React();
+    const signer = provider.getSigner()
+    console.log("signer is", signer)
+    try {
+        const pool = new ethers.Contract(addr, abi, signer)
+        console.log("pool", pool)
+        const tx = pool.supply(assetAddr, amount, account, referralCode, signer)
+        console.log("tx", tx)
+    } catch (error) {
+        console.error(error)
+    }
+}
