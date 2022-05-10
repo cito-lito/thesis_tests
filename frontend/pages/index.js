@@ -22,9 +22,8 @@ import { ethers } from 'ethers';
 import * as data from "../brownie-config.json"
 import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import { useState } from 'react';
-import { getApy } from '../lendingPoolAaveV3';
+import { getApy, depositToAave } from '../lendingPoolAaveV3';
 import { parseUnits } from 'ethers/lib/utils';
-
 
 
 // Erc balances
@@ -32,7 +31,6 @@ async function getBalanceErc20(provider, account, erc_addr) {
   try {
     const contract = new ethers.Contract(erc_addr, erc20.abi, provider);
     return (await contract.balanceOf(account));
-
   } catch (error) {
     console.error(error);
   }
@@ -53,7 +51,6 @@ function userBalances(erc_addr = "undefined") {
     }
     provider.getBalance(account).then((balance) => {
       const balanceInEth = ethers.utils.formatEther(balance)
-      console.log("balance eth", balanceInEth)
       setBalance(balanceInEth)
     })
     return balance;
@@ -61,9 +58,10 @@ function userBalances(erc_addr = "undefined") {
 }
 
 export default function Home() {
+
   const [apyDai, setApyDai] = useState(0);
   const [apyWeth, setApyWeth] = useState(0);
-  const { active } = useWeb3React();
+  //const { active } = useWeb3React();
   // inputs
   const [inputValue, setInputValue] = useState("");
   const [inputWithdraw, setInputWithdraw] = useState("");
@@ -83,6 +81,7 @@ export default function Home() {
     const input = event.target.value;
     console.log("entering", input)
     if (!isNaN(input)) {
+
       setInputWithdraw(input);
     } else {
       alert("enter a valid imput")
@@ -90,21 +89,18 @@ export default function Home() {
     }
     event.preventDefault();
   }
-  const test = (val) => {
-    console.log(val)
-    setInputValue("")
-    setInputWithdraw("")
-  }
-  if (active) {
-    getApy(data.networks.rinkeby.dai).then((value) => {
-      setApyDai(value)
-    })
-    getApy(data.networks.rinkeby.weth).then((value) => {
-      setApyWeth(value)
-    })
-  }
-  const a = ethers.utils.parseEther('0.000000000000000009')
-  console.log(a.toBigInt())
+
+
+  // if (active) {
+
+  //   getApy(data.networks.rinkeby.dai).then((value) => {
+  //     setApyDai(value)
+  //   })
+  //   getApy(data.networks.rinkeby.weth).then((value) => {
+  //     setApyWeth(value)
+  //   })
+
+  // }
   return (
     <React.Fragment>
       <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
@@ -146,20 +142,24 @@ export default function Home() {
               </CardContent>
               <CardActions>
                 <ul>
-                  <TextField  variant="outlined" label="enter amount" size="small"
+                  <TextField variant="outlined" label="enter amount" size="small"
                     value={inputValue}
                     onChange={handleInputDeposit}
                   />
-                  <Button onClick={() => test(inputValue)} fullWidth variant={"outlined"}>
+                  <Button onClick={() => depositToAave(
+                    data.networks.rinkeby.dai,
+                    ethers.utils.parseEther(inputValue)
+
+                  )} fullWidth variant={"outlined"}>
                     Deposit{' '}
                   </Button>
                 </ul>
                 <ul>
-                  <TextField  variant="outlined" label="enter amount" size="small"
+                  <TextField variant="outlined" label="enter amount" size="small"
                     value={inputWithdraw}
                     onChange={handleInputWithdraw}
                   />
-                  <Button onClick={() => test(inputValue)} fullWidth variant={"outlined"}>
+                  <Button onClick={() => test(inputWithdraw)} fullWidth variant={"outlined"}>
                     withdraw{'  '}
                   </Button>
                 </ul>
