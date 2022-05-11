@@ -21,7 +21,7 @@ import { ethers } from 'ethers';
 import * as data from "../brownie-config.json"
 import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import { useState } from 'react';
-import { getApy, depositToAave } from '../lendingPoolAaveV3';
+import { getApy, depositToAave, withdrawFromAave } from '../lendingPoolAaveV3';
 import { parseUnits } from 'ethers/lib/utils';
 import { userBalances } from '../balances';
 
@@ -101,6 +101,12 @@ export default function Home() {
       updateUserData();
     })
   }
+  const handleWithdraw = () => {
+    withdrawFromAave(data.networks.rinkeby.dai, ethers.utils.parseEther(inputWithdraw), account, provider).then(() => {
+      setInputWithdraw("")
+      updateUserData();
+    })
+  }
 
 
 
@@ -158,8 +164,8 @@ export default function Home() {
                     value={inputWithdraw}
                     onChange={handleInputWithdraw}
                   />
-                  <Button onClick={() => test(inputWithdraw)} fullWidth variant={"outlined"}>
-                    withdraw{'  '}
+                  <Button onClick={handleWithdraw} fullWidth variant={"outlined"}>
+                    withdraw{' '}
                   </Button>
                 </ul>
               </CardActions>

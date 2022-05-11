@@ -18,9 +18,8 @@ async function getPoolContract(provider) {
     try {
         const pool_addr_prov = new ethers.Contract(addr, abi, provider);
         const pool_addr = await pool_addr_prov.getPool()
-        
+
         const pool = new ethers.Contract(pool_addr, IPool.abi, provider);
-      
         return pool;
     } catch (error) {
         console.error(error)
@@ -34,14 +33,12 @@ async function getPoolContract(provider) {
 async function getPoolContractWrite(provider) {
     const addr = data.networks.rinkeby.pool_addr_provider
     const abi = IPoolAddressProvider.abi
-    console.log("get pool contract write")
-    console.log("provider ", provider)
     try {
         const pool_addr_prov = new ethers.Contract(addr, abi, provider);
         const pool_addr = await pool_addr_prov.getPool()
         console.log("provider get Signer ", provider.getSigner())
         const pool = new ethers.Contract(pool_addr, IPool.abi, provider.getSigner());
-        
+
         return pool;
     } catch (error) {
         console.error(error)
@@ -98,16 +95,11 @@ export async function getApy(asset_addr, provider) {
 /**
  * Supplies an amount of underlying asset into the reserve, receiving in return overlying aTokens.
     E.g. User supplies 100 DAI and gets in return 100 aDAI
- * @param assetAddr 
- * @param amount 
  * @param referralCode: optional default to 0 
  */
-export async function depositToAave(assetAddr, amount, referralCode, provider, account) {
-    console.log("depositing", amount)
-    console.log("provider ", provider)
+export async function depositToAave(assetAddr, amount, referralCode = 0, provider, account) {
     try {
         const pool = await getPoolContractWrite(provider);
-        console.log("pool addr is", pool.address)
         //approve amount to deposit in the aave vault
         const erc20Contract = await getERC20ContractWrite(assetAddr, provider)
         console.log("ercContract", erc20Contract)
@@ -118,7 +110,21 @@ export async function depositToAave(assetAddr, amount, referralCode, provider, a
         const tx_deposit = await pool.supply(assetAddr, amount, account, referralCode)
         return await tx_deposit.wait();
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
+/**
+ * Withdraws an amount of underlying asset from the reserve, 
+ * burning the equivalent aTokens owned 
+ */
+export async function withdrawFromAave(assetAddr, amount, addrTo, provider) {
+    try {
+        const pool = await getPoolContractWrite(provider);
+        const tx_withdraw = await pool.withdraw(assetAddr, amount, addrTo)
+        return await tx_withdraw.wait()
+    } catch (error) {
+        console.error(error)
+    }
+}
+// tx = pool.withdraw(asset_addr, amount, to.address, {"from": to})
