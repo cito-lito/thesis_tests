@@ -16,6 +16,7 @@ export default function ConnectMetamask() {
                     </div>) :
                     (<Button href="#" variant="outlined" sx={{ my: 1, mx: 1.5 }}
                         onClick={() => { activate(injected) }}>Connect Metamask</Button>)
+
             }
         </div>
     )

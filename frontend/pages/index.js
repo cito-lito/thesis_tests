@@ -2,7 +2,6 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { Avatar } from '@mui/material';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -24,56 +23,62 @@ import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import { useState } from 'react';
 import { getApy, depositToAave } from '../lendingPoolAaveV3';
 import { parseUnits } from 'ethers/lib/utils';
+import { userBalances } from '../balances';
 
 
-// Erc balances
-async function getBalanceErc20(provider, account, erc_addr) {
-  try {
-    const contract = new ethers.Contract(erc_addr, erc20.abi, provider);
-    return (await contract.balanceOf(account));
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// get user balances, returns erc balances if erc addr is passed, eth balacnes else
-function userBalances(erc_addr = "undefined") {
-  const [balance, setBalance] = useState(0);
-  const { active, account, library: provider } = useWeb3React();
-  if (active) {
-    if (erc_addr !== "undefined") {
-      getBalanceErc20(provider, account, erc_addr).then((value) => {
-        const bal = value.toBigInt()
-        const ercBalance = ethers.utils.formatEther(bal)
-        setBalance(ercBalance)
-      });
-      return balance;
-    }
-    provider.getBalance(account).then((balance) => {
-      const balanceInEth = ethers.utils.formatEther(balance)
-      setBalance(balanceInEth)
-    })
-    return balance;
-  }
-}
 
 export default function Home() {
 
+  const { active, account, library: provider } = useWeb3React();
+
+  //APYs
   const [apyDai, setApyDai] = useState(0);
   const [apyWeth, setApyWeth] = useState(0);
-  //const { active } = useWeb3React();
+
   // inputs
-  const [inputValue, setInputValue] = useState("");
+  const [inputDeposit, setInputDeposit] = useState("");
   const [inputWithdraw, setInputWithdraw] = useState("");
 
+  //balances
+  const [daiBalance, setDaiBalance] = useState(0);
+  const [aDaiBalance, setADaiBalance] = useState(0);
+  const [wethBalance, setWethBalance] = useState(0);
+  const [aWethBalance, setAWethBalance] = useState(0);
+  const [ethBalance, setEthBalance] = useState(0);
+
+  const updateUserData = () => {
+    if (active) {
+      getApy(data.networks.rinkeby.dai, provider).then((value) => {
+        setApyDai(value)
+      })
+      getApy(data.networks.rinkeby.weth, provider).then((value) => {
+        setApyWeth(value)
+      })
+      userBalances(data.networks.rinkeby.dai, provider, account).then((value) => {
+        setDaiBalance(value)
+      })
+      userBalances(data.networks.rinkeby.aDAI, provider, account).then((value) => {
+        setADaiBalance(value)
+      })
+      userBalances(data.networks.rinkeby.weth, provider, account).then((value) => {
+        setWethBalance(value)
+      })
+      userBalances(data.networks.rinkeby.aWETH, provider, account).then((value) => {
+        setAWethBalance(value)
+      })
+
+    }
+  }
+
+  updateUserData()
   const handleInputDeposit = (event) => {
     const input = event.target.value;
     console.log("entering", input)
     if (!isNaN(input)) {
-      setInputValue(input);
+      setInputDeposit(input);
     } else {
       alert("enter a valid imput")
-      setInputValue("")
+      setInputDeposit("")
     }
     event.preventDefault();
   }
@@ -90,17 +95,15 @@ export default function Home() {
     event.preventDefault();
   }
 
+  const handleDeposit = () => {
+    depositToAave(data.networks.rinkeby.dai, ethers.utils.parseEther(inputDeposit), 0, provider, account).then(() => {
+      setInputDeposit("")
+      updateUserData();
+    })
+  }
 
-  // if (active) {
 
-  //   getApy(data.networks.rinkeby.dai).then((value) => {
-  //     setApyDai(value)
-  //   })
-  //   getApy(data.networks.rinkeby.weth).then((value) => {
-  //     setApyWeth(value)
-  //   })
 
-  // }
   return (
     <React.Fragment>
       <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
@@ -132,10 +135,10 @@ export default function Home() {
                       APY: {apyDai} %
                     </ul>
                     <ul>
-                      Balance: {userBalances(data.networks.rinkeby.dai)}
+                      Balance: {daiBalance}
                     </ul>
                     <ul>
-                      Deposited: {userBalances(data.networks.rinkeby.aDAI)}
+                      Deposited: {aDaiBalance}
                     </ul>
                   </Typography>
                 </Box>
@@ -143,14 +146,10 @@ export default function Home() {
               <CardActions>
                 <ul>
                   <TextField variant="outlined" label="enter amount" size="small"
-                    value={inputValue}
+                    value={inputDeposit}
                     onChange={handleInputDeposit}
                   />
-                  <Button onClick={() => depositToAave(
-                    data.networks.rinkeby.dai,
-                    ethers.utils.parseEther(inputValue)
-
-                  )} fullWidth variant={"outlined"}>
+                  <Button onClick={handleDeposit} fullWidth variant={"outlined"}>
                     Deposit{' '}
                   </Button>
                 </ul>
