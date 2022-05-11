@@ -48,24 +48,7 @@ export default function Home() {
   const [aWethBalance, setAWethBalance] = useState(0);
   const [ethBalance, setEthBalance] = useState(0);
 
-  const getCheckBalance = (token) => {
-    switch (token) {
-      case data.networks.rinkeby.dai:
-        return daiBalance, inputDaiDeposit
-        break;
-      case data.networks.rinkeby.aDAI:
-        return aDaiBalance
-        break;
-      case data.networks.rinkeby.weth:
-        return wethBalance
-        break;
-      case data.networks.rinkeby.aWETH:
-        return aWethBalance
-        break;
-      default:
-        break;
-    }
-  }
+
 
   const updateUserData = () => {
     if (active) {
@@ -137,26 +120,26 @@ export default function Home() {
     event.preventDefault();
   }
 
-  const handleDeposit = (assetAddr) => {
-    let {checkBalance, checkInput}  = getCheckBalance(assetAddr)
-    console.log("Balance", checkBalance)
-    console.log("input deposit", checkInput)
-    if (checkBalance >= checkInput) {
-      depositToAave(assetAddr, ethers.utils.parseEther(inputDaiDeposit), 0, provider, account).then(() => {
+  const handleDeposit = (assetAddr, balance, amount) => {
+    console.log("Balance", balance)
+    console.log("input", amount)
+    if (balance >= Number(amount)) {
+      depositToAave(assetAddr, ethers.utils.parseEther(amount), 0, provider, account).then(() => {
         setInputDaiDeposit("")
+        setInputWethDeposit("")
         updateUserData();
       })
     } else {
       alert("insuficient bal")
     }
   }
-  const handleWithdraw = (assetAddr) => {
-    const checkBalance = getCheckBalance(assetAddr)
-    console.log("Balance", checkBalance)
-    console.log("input withdraw", inputDaiDeposit)
-    if (checkBalance >= Number(inputDaiWithdraw)) {
-      withdrawFromAave(assetAddr, ethers.utils.parseEther(inputDaiWithdraw), account, provider).then(() => {
+  const handleWithdraw = (assetAddr, balance, amount) => {
+    console.log("Balance", balance)
+    console.log("input withdraw", amount)
+    if (balance >= Number(amount)) {
+      withdrawFromAave(assetAddr, ethers.utils.parseEther(amount), account, provider).then(() => {
         setInputDaiWithdraw("")
+        setInputWethWithdraw("")
         updateUserData();
       })
     } else {
@@ -202,7 +185,7 @@ export default function Home() {
                     value={inputDaiDeposit}
                     onChange={handleInputDaiDeposit}
                   />
-                  <Button onClick={() => { handleDeposit(data.networks.rinkeby.dai) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleDeposit(data.networks.rinkeby.dai, daiBalance, inputDaiDeposit) }} fullWidth variant={"outlined"}>
                     Deposit{' '}
                   </Button>
                 </ul>
@@ -212,7 +195,7 @@ export default function Home() {
                     onChange={handleInputDaiWithdraw}
                   />
 
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.dai) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.dai, aDaiBalance, inputDaiWithdraw) }} fullWidth variant={"outlined"}>
                     withdraw{' '}
                   </Button>
                 </ul>
@@ -240,7 +223,7 @@ export default function Home() {
                     value={inputWethDeposit}
                     onChange={handleInputWethDeposit}
                   />
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth, wethBalance, inputWethDeposit) }} fullWidth variant={"outlined"}>
                     Deposit{' '}
                   </Button>
                 </ul>
@@ -249,7 +232,7 @@ export default function Home() {
                     value={inputWethWithdraw}
                     onChange={handleInputWethWithdraw}
                   />
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth, aWethBalance, inputWethWithdraw) }} fullWidth variant={"outlined"}>
                     withdraw{' '}
                   </Button>
                 </ul>
