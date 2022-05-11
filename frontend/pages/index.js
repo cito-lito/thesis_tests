@@ -36,8 +36,10 @@ export default function Home() {
   const [apyWeth, setApyWeth] = useState(0);
 
   // inputs
-  const [inputDeposit, setInputDeposit] = useState("");
-  const [inputWithdraw, setInputWithdraw] = useState("");
+  const [inputDaiDeposit, setInputDaiDeposit] = useState("");
+  const [inputDaiWithdraw, setInputDaiWithdraw] = useState("");
+  const [inputWethDeposit, setInputWethDeposit] = useState("");
+  const [inputWethWithdraw, setInputWethWithdraw] = useState("");
 
   //balances
   const [daiBalance, setDaiBalance] = useState(0);
@@ -45,6 +47,25 @@ export default function Home() {
   const [wethBalance, setWethBalance] = useState(0);
   const [aWethBalance, setAWethBalance] = useState(0);
   const [ethBalance, setEthBalance] = useState(0);
+
+  const getCheckBalance = (token) => {
+    switch (token) {
+      case data.networks.rinkeby.dai:
+        return daiBalance, inputDaiDeposit
+        break;
+      case data.networks.rinkeby.aDAI:
+        return aDaiBalance
+        break;
+      case data.networks.rinkeby.weth:
+        return wethBalance
+        break;
+      case data.networks.rinkeby.aWETH:
+        return aWethBalance
+        break;
+      default:
+        break;
+    }
+  }
 
   const updateUserData = () => {
     if (active) {
@@ -69,46 +90,79 @@ export default function Home() {
 
     }
   }
+  updateUserData();
 
-  updateUserData()
-  const handleInputDeposit = (event) => {
+  const handleInputDaiDeposit = (event) => {
     const input = event.target.value;
     console.log("entering", input)
     if (!isNaN(input)) {
-      setInputDeposit(input);
+      setInputDaiDeposit(input);
     } else {
       alert("enter a valid imput")
-      setInputDeposit("")
+      setInputDaiDeposit("")
     }
     event.preventDefault();
   }
-  const handleInputWithdraw = (event) => {
+  const handleInputDaiWithdraw = (event) => {
     const input = event.target.value;
     console.log("entering", input)
     if (!isNaN(input)) {
-
-      setInputWithdraw(input);
+      setInputDaiWithdraw(input);
     } else {
       alert("enter a valid imput")
-      setInputWithdraw("")
+      setInputDaiWithdraw("")
+    }
+    event.preventDefault();
+  }
+  const handleInputWethDeposit = (event) => {
+    const input = event.target.value;
+    console.log("entering", input)
+    if (!isNaN(input)) {
+      setInputWethDeposit(input);
+    } else {
+      alert("enter a valid imput")
+      setInputWethDeposit("")
+    }
+    event.preventDefault();
+  }
+  const handleInputWethWithdraw = (event) => {
+    const input = event.target.value;
+    console.log("entering", input)
+    if (!isNaN(input)) {
+      setInputWethWithdraw(input);
+    } else {
+      alert("enter a valid imput")
+      setInputWethWithdraw("")
     }
     event.preventDefault();
   }
 
-  const handleDeposit = () => {
-    depositToAave(data.networks.rinkeby.dai, ethers.utils.parseEther(inputDeposit), 0, provider, account).then(() => {
-      setInputDeposit("")
-      updateUserData();
-    })
+  const handleDeposit = (assetAddr) => {
+    let {checkBalance, checkInput}  = getCheckBalance(assetAddr)
+    console.log("Balance", checkBalance)
+    console.log("input deposit", checkInput)
+    if (checkBalance >= checkInput) {
+      depositToAave(assetAddr, ethers.utils.parseEther(inputDaiDeposit), 0, provider, account).then(() => {
+        setInputDaiDeposit("")
+        updateUserData();
+      })
+    } else {
+      alert("insuficient bal")
+    }
   }
-  const handleWithdraw = () => {
-    withdrawFromAave(data.networks.rinkeby.dai, ethers.utils.parseEther(inputWithdraw), account, provider).then(() => {
-      setInputWithdraw("")
-      updateUserData();
-    })
+  const handleWithdraw = (assetAddr) => {
+    const checkBalance = getCheckBalance(assetAddr)
+    console.log("Balance", checkBalance)
+    console.log("input withdraw", inputDaiDeposit)
+    if (checkBalance >= Number(inputDaiWithdraw)) {
+      withdrawFromAave(assetAddr, ethers.utils.parseEther(inputDaiWithdraw), account, provider).then(() => {
+        setInputDaiWithdraw("")
+        updateUserData();
+      })
+    } else {
+      alert("insuficient balance")
+    }
   }
-
-
 
   return (
     <React.Fragment>
@@ -133,38 +187,32 @@ export default function Home() {
             <Card>
               <CardHeader title={"DAI"} titleTypographyProps={{ align: 'center' }}
                 subheaderTypographyProps={{ align: 'center' }} sx={sx_header} />
-
               <CardContent>
                 <Box sx={sx_card}>
                   <Typography component="h1" variant="h6">
-                    <ul>
-                      APY: {apyDai} %
-                    </ul>
-                    <ul>
-                      Balance: {daiBalance}
-                    </ul>
-                    <ul>
-                      Deposited: {aDaiBalance}
-                    </ul>
+                    <ul> APY: {apyDai.toFixed(9)} %</ul>
+                    <ul> Balance: {daiBalance}</ul>
+                    <ul> Deposited: {aDaiBalance}</ul>
                   </Typography>
                 </Box>
               </CardContent>
               <CardActions>
                 <ul>
                   <TextField variant="outlined" label="enter amount" size="small"
-                    value={inputDeposit}
-                    onChange={handleInputDeposit}
+                    value={inputDaiDeposit}
+                    onChange={handleInputDaiDeposit}
                   />
-                  <Button onClick={handleDeposit} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleDeposit(data.networks.rinkeby.dai) }} fullWidth variant={"outlined"}>
                     Deposit{' '}
                   </Button>
                 </ul>
                 <ul>
                   <TextField variant="outlined" label="enter amount" size="small"
-                    value={inputWithdraw}
-                    onChange={handleInputWithdraw}
+                    value={inputDaiWithdraw}
+                    onChange={handleInputDaiWithdraw}
                   />
-                  <Button onClick={handleWithdraw} fullWidth variant={"outlined"}>
+
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.dai) }} fullWidth variant={"outlined"}>
                     withdraw{' '}
                   </Button>
                 </ul>
@@ -172,6 +220,44 @@ export default function Home() {
             </Card>
           </Grid>
           {/* */}
+          {/* */}
+          <Grid item xs={4} sm={6} md={6}>
+            <Card>
+              <CardHeader title={"WETH"} titleTypographyProps={{ align: 'center' }}
+                subheaderTypographyProps={{ align: 'center' }} sx={sx_header} />
+              <CardContent>
+                <Box sx={sx_card}>
+                  <Typography component="h1" variant="h6">
+                    <ul> APY: {apyWeth.toFixed(9)} %</ul>
+                    <ul> Balance: {wethBalance}</ul>
+                    <ul> Deposited: {aWethBalance}</ul>
+                  </Typography>
+                </Box>
+              </CardContent>
+              <CardActions>
+                <ul>
+                  <TextField variant="outlined" label="enter amount" size="small"
+                    value={inputWethDeposit}
+                    onChange={handleInputWethDeposit}
+                  />
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth) }} fullWidth variant={"outlined"}>
+                    Deposit{' '}
+                  </Button>
+                </ul>
+                <ul>
+                  <TextField variant="outlined" label="enter amount" size="small"
+                    value={inputWethWithdraw}
+                    onChange={handleInputWethWithdraw}
+                  />
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth) }} fullWidth variant={"outlined"}>
+                    withdraw{' '}
+                  </Button>
+                </ul>
+              </CardActions>
+            </Card>
+          </Grid>
+          {/* */}
+
         </Grid>
       </Container>
 
