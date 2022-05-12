@@ -13,6 +13,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Container from '@mui/material/Container';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { sx_card, sx_header } from '../stile';
 import TitleDescription from '../components/titleDescription';
 import ConnectMetamask from '../components/connectMetamask';
@@ -24,7 +25,6 @@ import { useState } from 'react';
 import { getApy, depositToAave, withdrawFromAave } from '../lendingPoolAaveV3';
 import { parseUnits } from 'ethers/lib/utils';
 import { userBalances } from '../balances';
-
 
 
 export default function Home() {
@@ -173,7 +173,7 @@ export default function Home() {
               <CardContent>
                 <Box sx={sx_card}>
                   <Typography component="h1" variant="h6">
-                    <ul> APY: {apyDai.toFixed(9)} %</ul>
+                    <ul> APY: {apyDai.toFixed(7)} %</ul>
                     <ul> Balance: {daiBalance}</ul>
                     <ul> Deposited: {aDaiBalance}</ul>
                   </Typography>
@@ -185,9 +185,11 @@ export default function Home() {
                     value={inputDaiDeposit}
                     onChange={handleInputDaiDeposit}
                   />
-                  <Button onClick={() => { handleDeposit(data.networks.rinkeby.dai, daiBalance, inputDaiDeposit) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleDeposit(data.networks.rinkeby.dai, daiBalance, inputDaiDeposit) }}
+                    fullWidth variant="outlined">
                     Deposit{' '}
                   </Button>
+
                 </ul>
                 <ul>
                   <TextField variant="outlined" label="enter amount" size="small"
@@ -195,7 +197,8 @@ export default function Home() {
                     onChange={handleInputDaiWithdraw}
                   />
 
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.dai, aDaiBalance, inputDaiWithdraw) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.dai, aDaiBalance, inputDaiWithdraw) }}
+                    fullWidth variant={"outlined"}>
                     withdraw{' '}
                   </Button>
                 </ul>
@@ -211,7 +214,7 @@ export default function Home() {
               <CardContent>
                 <Box sx={sx_card}>
                   <Typography component="h1" variant="h6">
-                    <ul> APY: {apyWeth.toFixed(9)} %</ul>
+                    <ul> APY: {apyWeth.toFixed(7)} %</ul>
                     <ul> Balance: {wethBalance}</ul>
                     <ul> Deposited: {aWethBalance}</ul>
                   </Typography>

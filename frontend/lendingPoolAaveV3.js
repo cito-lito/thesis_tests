@@ -86,7 +86,7 @@ export async function getApy(asset_addr, provider) {
         const supplyRateNumber = Number(supplyRate)
         const depositAPR = supplyRateNumber / RAY
         const depositAPY = ((1 + (depositAPR / SECONDS_PER_YEAR)) ** SECONDS_PER_YEAR) - 1
-        return depositAPY;
+        return (depositAPY*100);
     } catch (error) {
         console.error(error);
     }
