@@ -50,7 +50,7 @@ def get_user_acc_data(addr):
     return pool.getUserAccountData(addr)
 
 
-def get_reserved_data(asset_addr):
+def get_reserve_data(asset_addr):
     """Returns the state and configuration of the reserve
     Args:
         asset_addr: asset The address of the underlying asset of the reserve
@@ -83,7 +83,7 @@ def get_apy(asset_addr):
         accruedToTreasury,
         unbacked,
         isolationModeTotalDebt,
-    ) = get_reserved_data(asset_addr)
+    ) = get_reserve_data(asset_addr)
     print(currentLiquidityRate)   
     SECONDS_PER_YEAR = 31536000
     RAY = 10**27
@@ -91,11 +91,18 @@ def get_apy(asset_addr):
     depositAPY = ((1 + (depositAPR / SECONDS_PER_YEAR)) ** SECONDS_PER_YEAR) - 1
     return depositAPY
     
+    
+def deposit_eth(pool, account, amount):
+    
+    wethGA = interface.IWETHGateway(config["networks"][network.show_active()]["wethGateway"])
+    print(wethGA)
+    tx = wethGA.depositETH(pool, account, 0, {"from": account, "value": amount})
+    tx.wait(1)
 
 def main():
-    # account = utils.get_account("dev")
-
-    token_addr = config["networks"][network.show_active()]["dai"]
+    account = utils.get_account("dev")
+    lending_pool = get_pool()
+    deposit_eth(lending_pool.address, account.address, Wei("1 ether"))
 
 if __name__ == "__main__":
     main()

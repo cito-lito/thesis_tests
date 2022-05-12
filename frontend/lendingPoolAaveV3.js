@@ -4,6 +4,7 @@ import * as data from "./brownie-config.json"
 import IPoolAddressProvider from "./brownie_build/interfaces/IPoolAddressesProvider.json"
 import IPool from "./brownie_build/interfaces/IPool.json"
 import IERC20 from "./brownie_build/interfaces/IERC20.json"
+import IWETHGateway from "./brownie_build/interfaces/IWETHGateway.json"
 
 const SECONDS_PER_YEAR = 31536000
 const RAY = 10 ** 27
@@ -58,7 +59,9 @@ async function getERC20ContractWrite(erc_addr, provider) {
     }
 }
 
-
+/**
+ * Returns the computed apy of the lending pool for a given asset
+ */
 export async function getApy(asset_addr, provider) {
 
     try {
@@ -127,4 +130,31 @@ export async function withdrawFromAave(assetAddr, amount, addrTo, provider) {
         console.error(error)
     }
 }
-// tx = pool.withdraw(asset_addr, amount, to.address, {"from": to})
+
+/**
+ * Deposit ETH using WethGateway
+ */
+ export async function depositETHtoAave(onBehalfOf, referralCode = 0, provider, amount){
+    try {
+        const pool = await getPoolContract(provider);
+        const contract = new ethers.Contract(data.networks.rinkeby.wethGateway, IWETHGateway.abi, provider.Signer()) 
+        const tx = await contract.depositETH(pool.address, onBehalfOf, referralCode, {value: amount})
+        return await tx.wait()
+    } catch (error) {
+       console.error(error) 
+    }
+}
+
+/**
+ * Withdraw ETH using WethGateway
+ */
+export async function withdrawETHfromAave(onBehalfOf, referralCode = 0, provider, amount){
+    try {
+        const pool = await getPoolContract(provider);
+        const contract = new ethers.Contract(data.networks.rinkeby.wethGateway, IWETHGateway.abi, provider.Signer()) 
+        const tx = await contract.withdrawETH(pool.address, amount, onBehalfOf)
+        return await tx.wait()
+    } catch (error) {
+       console.error(error) 
+    }
+}
