@@ -6,5 +6,5 @@ KOvan : 42
 */
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [4, 42]
+  supportedChainIds: [1, 3, 4, 5, 42]
 })

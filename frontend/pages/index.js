@@ -29,7 +29,7 @@ import { userBalances } from '../balances';
 
 export default function Home() {
 
-  const { active, account, library: provider } = useWeb3React();
+  const { active, chainId, account, library: provider } = useWeb3React();
 
   //APYs
   const [apyDai, setApyDai] = useState(0);
@@ -53,7 +53,7 @@ export default function Home() {
 
 
   const updateUserData = () => {
-    if (active) {
+    if (active && chainId === 4) {
       getApy(data.networks.rinkeby.dai, provider).then((value) => {
         setApyDai(value)
       })
@@ -214,7 +214,7 @@ export default function Home() {
         sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
         <Toolbar sx={{ flexWrap: 'wrap' }}>
           <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            THESIS DAPP
+            TEST_DAPP
           </Typography>
           <ConnectMetamask />
         </Toolbar>

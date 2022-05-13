@@ -4,14 +4,20 @@ import Container from '@mui/material/Container';
 export default function TitleDescription() {
     return (
         <div>
-            <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
-                <Typography component="h1" variant="h2" align="center"
+            <Container disableGutters maxWidth="lg" component="main" sx={{ pt: 6, pb: 6 }}>
+                <Typography component="h2" variant="h3" align="center"
                     color="text.primary" gutterBottom >
-                 Deposit assets to earn interest using Aave
+                    Deposit assets to earn interest using Aave - rinkeby testnet
                 </Typography>
-                {/* <Typography variant="h5" align="center" color="text.secondary" component="p">
-                    Deposit assets to earn interest using Aave
-                </Typography> */}
+                <Typography variant="h5" align="center" color="text.secondary" component="p">
+                    Get test tokens:
+                </Typography>
+                <Typography variant="h6" align="center" color="text.secondary" component="p">
+                    <a href="https://faucets.chain.link/rinkeby" target="_blank">Eth rinkeby</a>
+                </Typography>
+                <Typography variant="h6" align="center" color="text.secondary" component="p">
+                    <a href="https://staging.aave.com/faucet/" target="_blank">Aave rinkeby test assets</a>
+                </Typography>
             </Container>
         </div>)
 }
