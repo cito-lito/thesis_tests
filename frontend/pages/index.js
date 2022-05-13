@@ -22,7 +22,7 @@ import { ethers } from 'ethers';
 import * as data from "../brownie-config.json"
 import * as erc20 from "../brownie_build/interfaces/IERC20.json"
 import { useState } from 'react';
-import { getApy, depositToAave, withdrawFromAave } from '../lendingPoolAaveV3';
+import { getApy, depositToAave, withdrawFromAave, depositETHtoAave, withdrawETHfromAave } from '../lendingPoolAaveV3';
 import { parseUnits } from 'ethers/lib/utils';
 import { userBalances } from '../balances';
 
@@ -40,6 +40,8 @@ export default function Home() {
   const [inputDaiWithdraw, setInputDaiWithdraw] = useState("");
   const [inputWethDeposit, setInputWethDeposit] = useState("");
   const [inputWethWithdraw, setInputWethWithdraw] = useState("");
+  const [inputEthDeposit, setInputEthDeposit] = useState("");
+  const [inputEthWithdraw, setInputEthWithdraw] = useState("");
 
   //balances
   const [daiBalance, setDaiBalance] = useState(0);
@@ -70,6 +72,9 @@ export default function Home() {
       userBalances(data.networks.rinkeby.aWETH, provider, account).then((value) => {
         setAWethBalance(value)
       })
+      userBalances("ether",provider, account).then((value) => {
+        setEthBalance(value)
+      })
 
     }
   }
@@ -97,6 +102,30 @@ export default function Home() {
     }
     event.preventDefault();
   }
+
+  const handleInputETHDeposit = (event) => {
+    const input = event.target.value;
+    console.log("entering", input)
+    if (!isNaN(input)) {
+      setInputEthDeposit(input);
+    } else {
+      alert("enter a valid imput")
+      setInputEthDeposit("")
+    }
+    event.preventDefault();
+  }
+  const handleInputETHWithdraw = (event) => {
+    const input = event.target.value;
+    console.log("entering", input)
+    if (!isNaN(input)) {
+      setInputEthWithdraw(input);
+    } else {
+      alert("enter a valid imput")
+      setInputEthWithdraw("")
+    }
+    event.preventDefault();
+  }
+
   const handleInputWethDeposit = (event) => {
     const input = event.target.value;
     console.log("entering", input)
@@ -120,7 +149,7 @@ export default function Home() {
     event.preventDefault();
   }
 
-  const handleDeposit = (assetAddr, balance, amount) => {
+  const handleDepositErc20 = (assetAddr, balance, amount) => {
     console.log("Balance", balance)
     console.log("input", amount)
     if (balance >= Number(amount)) {
@@ -130,10 +159,40 @@ export default function Home() {
         updateUserData();
       })
     } else {
-      alert("insuficient bal")
+      alert("insuficient balance")
     }
   }
-  const handleWithdraw = (assetAddr, balance, amount) => {
+
+  const handleDepositETH = (balance, amount) => {
+    console.log("Balance", balance)
+    console.log("input", amount)
+    if (balance >= Number(amount)) {
+      depositETHtoAave(account, 0, provider, ethers.utils.parseEther(amount)).then(() => {
+        setInputDaiDeposit("")
+        setInputWethDeposit("")
+        setInputEthDeposit("")
+        updateUserData();
+      })
+    } else {
+      alert("insuficient balance")
+    }
+  }
+  const handleWithdrawETH = (balance, amount) => {
+    console.log("Balance", balance)
+    console.log("input", amount)
+    if (balance >= Number(amount)) {
+      withdrawETHfromAave(account, provider, ethers.utils.parseEther(amount)).then(() => {
+        setInputDaiDeposit("")
+        setInputWethDeposit("")
+        setInputEthWithdraw("")
+        updateUserData();
+      })
+    } else {
+      alert("insuficient balance")
+    }
+  }
+
+  const handleWithdrawErc20 = (assetAddr, balance, amount) => {
     console.log("Balance", balance)
     console.log("input withdraw", amount)
     if (balance >= Number(amount)) {
@@ -164,7 +223,48 @@ export default function Home() {
       <TitleDescription />
       {/* */}
       <Container maxWidth="md" component="main">
-        <Grid container spacing={4} alignItems="flex-end">
+        <Grid container spacing={2} alignItems="flex-end">
+          {/* */}
+          <Grid item xs={4} sm={6} md={6}>
+            <Card>
+              <CardHeader title={"ETH"} titleTypographyProps={{ align: 'center' }}
+                subheaderTypographyProps={{ align: 'center' }} sx={sx_header} />
+              <CardContent>
+                <Box sx={sx_card}>
+                  <Typography component="h1" variant="h6">
+                    <ul> APY: {apyWeth.toFixed(7)} %</ul>
+                    <ul> Balance: {ethBalance}</ul>
+                    <ul> Deposited: {aWethBalance}</ul>
+                  </Typography>
+                </Box>
+              </CardContent>
+              <CardActions>
+                <ul>
+                  <TextField variant="outlined" label="enter amount" size="small"
+                    value={inputEthDeposit}
+                    onChange={handleInputETHDeposit}
+                  />
+                  <Button onClick={() => { handleDepositETH(ethBalance, inputEthDeposit) }}
+                    fullWidth variant="outlined">
+                    Deposit{' '}
+                  </Button>
+
+                </ul>
+                <ul>
+                  <TextField variant="outlined" label="enter amount" size="small"
+                    value={inputEthWithdraw}
+                    onChange={handleInputETHWithdraw}
+                  />
+
+                  <Button onClick={() => { handleWithdrawETH(aWethBalance, inputEthWithdraw) }}
+                    fullWidth variant={"outlined"}>
+                    withdraw{' '}
+                  </Button>
+                </ul>
+              </CardActions>
+            </Card>
+          </Grid>
+          {/* */}
           {/* */}
           <Grid item xs={4} sm={6} md={6}>
             <Card>
@@ -185,7 +285,7 @@ export default function Home() {
                     value={inputDaiDeposit}
                     onChange={handleInputDaiDeposit}
                   />
-                  <Button onClick={() => { handleDeposit(data.networks.rinkeby.dai, daiBalance, inputDaiDeposit) }}
+                  <Button onClick={() => { handleDepositErc20(data.networks.rinkeby.dai, daiBalance, inputDaiDeposit) }}
                     fullWidth variant="outlined">
                     Deposit{' '}
                   </Button>
@@ -197,7 +297,7 @@ export default function Home() {
                     onChange={handleInputDaiWithdraw}
                   />
 
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.dai, aDaiBalance, inputDaiWithdraw) }}
+                  <Button onClick={() => { handleWithdrawErc20(data.networks.rinkeby.dai, aDaiBalance, inputDaiWithdraw) }}
                     fullWidth variant={"outlined"}>
                     withdraw{' '}
                   </Button>
@@ -207,7 +307,7 @@ export default function Home() {
           </Grid>
           {/* */}
           {/* */}
-          <Grid item xs={4} sm={6} md={6}>
+          {/* <Grid item xs={4} sm={6} md={6}>
             <Card>
               <CardHeader title={"WETH"} titleTypographyProps={{ align: 'center' }}
                 subheaderTypographyProps={{ align: 'center' }} sx={sx_header} />
@@ -226,7 +326,7 @@ export default function Home() {
                     value={inputWethDeposit}
                     onChange={handleInputWethDeposit}
                   />
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth, wethBalance, inputWethDeposit) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleWithdrawErc20(data.networks.rinkeby.weth, wethBalance, inputWethDeposit) }} fullWidth variant={"outlined"}>
                     Deposit{' '}
                   </Button>
                 </ul>
@@ -235,14 +335,14 @@ export default function Home() {
                     value={inputWethWithdraw}
                     onChange={handleInputWethWithdraw}
                   />
-                  <Button onClick={() => { handleWithdraw(data.networks.rinkeby.weth, aWethBalance, inputWethWithdraw) }} fullWidth variant={"outlined"}>
+                  <Button onClick={() => { handleWithdrawErc20(data.networks.rinkeby.weth, aWethBalance, inputWethWithdraw) }} fullWidth variant={"outlined"}>
                     withdraw{' '}
                   </Button>
                 </ul>
               </CardActions>
             </Card>
           </Grid>
-          {/* */}
+           */}
 
         </Grid>
       </Container>

@@ -12,12 +12,13 @@ async function getBalanceErc20(provider, account, erc_addr) {
 }
 
 // get user balances, returns erc balances if erc addr is passed, eth balacnes else
-export async function userBalances(erc_addr = "undefined", provider, account) {
-    if (erc_addr !== "undefined") {
+export async function userBalances(erc_addr, provider, account) {
+    if (erc_addr !== "ether") {
         const value = await getBalanceErc20(provider, account, erc_addr)
         const balance = value.toBigInt()
         return ethers.utils.formatEther(balance)
+    } else {
+        const value = await provider.getBalance(account)
+        return ethers.utils.formatEther(value)
     }
-    const value = await provider.getBalance(account)
-    return ethers.utils.formatEther(value)
 }

@@ -137,7 +137,7 @@ export async function withdrawFromAave(assetAddr, amount, addrTo, provider) {
  export async function depositETHtoAave(onBehalfOf, referralCode = 0, provider, amount){
     try {
         const pool = await getPoolContract(provider);
-        const contract = new ethers.Contract(data.networks.rinkeby.wethGateway, IWETHGateway.abi, provider.Signer()) 
+        const contract = new ethers.Contract(data.networks.rinkeby.wethGateway, IWETHGateway.abi, provider.getSigner()) 
         const tx = await contract.depositETH(pool.address, onBehalfOf, referralCode, {value: amount})
         return await tx.wait()
     } catch (error) {
@@ -148,11 +148,16 @@ export async function withdrawFromAave(assetAddr, amount, addrTo, provider) {
 /**
  * Withdraw ETH using WethGateway
  */
-export async function withdrawETHfromAave(onBehalfOf, referralCode = 0, provider, amount){
+export async function withdrawETHfromAave(onBehalfOf, provider, amount){
     try {
         const pool = await getPoolContract(provider);
-        const contract = new ethers.Contract(data.networks.rinkeby.wethGateway, IWETHGateway.abi, provider.Signer()) 
+        const contract = new ethers.Contract(data.networks.rinkeby.wethGateway, IWETHGateway.abi, provider.getSigner()) 
+        const aweth = await getERC20ContractWrite(data.networks.rinkeby.aWETH, provider)
+        const tx_approve = await aweth.approve(contract.address, amount)
+        await tx_approve.wait()
+        console.log("approve tx", tx_approve)
         const tx = await contract.withdrawETH(pool.address, amount, onBehalfOf)
+        console.log(tx)
         return await tx.wait()
     } catch (error) {
        console.error(error) 
