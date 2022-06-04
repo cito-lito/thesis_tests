@@ -214,16 +214,18 @@ def main():
     # for i in reserve_data:
     #     print(i)
     
-    # print("start")
-    # a = interface.IUiPoolDataProviderV3("0x550f9764d56291B5B793b6dD1623af3346128BD2")
-    # print(a)
-    # pool_addr_prov = interface.IPoolAddressesProvider(
-    #     config["networks"][network.show_active()]["pool_addr_provider"]
-    # )
+    print("start")
+    a = interface.IUiPoolDataProviderV3("0x550f9764d56291B5B793b6dD1623af3346128BD2")
+    print(a)
+    pool_addr_prov = interface.IPoolAddressesProvider(
+        config["networks"][network.show_active()]["pool_addr_provider"]
+    )
 
-    # print("provider", pool_addr_prov)
-    # b = a.getUserReservesData(pool_addr_prov, account.address)
-    # print(b)
+    print("provider", pool_addr_prov)
+    a,b = a.getUserReservesData(pool_addr_prov, account.address)
+    print("UserreserversData")
+    
+    print(a) 
     # c = a.getReservesData(pool_addr_prov)
     # print(c)
 
